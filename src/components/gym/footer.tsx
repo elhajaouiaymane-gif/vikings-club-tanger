@@ -32,14 +32,11 @@ export function Footer() {
 
   return (
     <footer className="relative bg-background overflow-hidden text-foreground">
-      {/* Decorative top border */}
       <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent" />
-      {/* Subtle background glow */}
       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[600px] h-[300px] bg-primary/5 rounded-full blur-3xl pointer-events-none" />
 
       <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-8">
-          {/* Column 1: Brand */}
           <div className="space-y-4">
             <Link href="#home" className="inline-flex items-center gap-3 group">
               <img
@@ -58,18 +55,14 @@ export function Footer() {
             </p>
           </div>
 
-          {/* Column 2: Quick Links */}
           <div className="space-y-4">
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-foreground/80"style={{ fontFamily: "'Russo One', sans-serif" }}>
+            <h3 className="text-sm font-semibold uppercase tracking-wider text-foreground/80" style={{ fontFamily: "'Russo One', sans-serif" }}>
               {t('quick_links')}
             </h3>
             <ul className="space-y-3">
               {quickLinks.map((link) => (
                 <li key={link.label}>
-                  <Link
-                    href={link.href}
-                    className="text-sm text-muted-foreground hover:text-primary transition-colors duration-200"
-                  >
+                  <Link href={link.href} className="text-sm text-muted-foreground hover:text-primary transition-colors duration-200">
                     {link.label}
                   </Link>
                 </li>
@@ -77,18 +70,14 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Column 3: Services */}
           <div className="space-y-4">
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-foreground/80"style={{ fontFamily: "'Russo One', sans-serif" }}>
+            <h3 className="text-sm font-semibold uppercase tracking-wider text-foreground/80" style={{ fontFamily: "'Russo One', sans-serif" }}>
               {t('services')}
             </h3>
             <ul className="space-y-3">
               {services.map((service) => (
                 <li key={service.label}>
-                  <Link
-                    href={service.href}
-                    className="text-sm text-muted-foreground hover:text-primary transition-colors duration-200"
-                  >
+                  <Link href={service.href} className="text-sm text-muted-foreground hover:text-primary transition-colors duration-200">
                     {service.label}
                   </Link>
                 </li>
@@ -96,9 +85,8 @@ export function Footer() {
             </ul>
           </div>
 
-          {/* Column 4: Contact Info */}
           <div className="space-y-4">
-            <h3 className="text-sm font-semibold uppercase tracking-wider text-foreground/80"style={{ fontFamily: "'Russo One', sans-serif" }}>
+            <h3 className="text-sm font-semibold uppercase tracking-wider text-foreground/80" style={{ fontFamily: "'Russo One', sans-serif" }}>
               {t('contact_info')}
             </h3>
             <ul className="space-y-4">
@@ -125,7 +113,6 @@ export function Footer() {
           </div>
         </div>
 
-        {/* Social Media Icons Row */}
         <div className="mt-12 flex items-center gap-3">
           {socialLinks.map(({ icon: Icon, href, label }) => (
             <Link
@@ -149,7 +136,7 @@ export function Footer() {
           <p>&copy; 2025 Vikings Club Tanger. {t('footer_rights')}</p>
           <div className="flex items-center gap-4">
             <a
-              href="https://maps.app.goo.gl/aePHaegRpa4sFRvm8"
+              href="https://maps.app.goo.gl/Mt5wmHa8NQM78rkM9"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-primary transition-colors duration-200"
@@ -158,7 +145,7 @@ export function Footer() {
             </a>
             <span className="text-border">|</span>
             <a
-              href="https://maps.app.goo.gl/QUjLGETtyvZkwxvG8"
+              href="https://maps.app.goo.gl/MUHsAPWeKtex4BfK8"
               target="_blank"
               rel="noopener noreferrer"
               className="hover:text-primary transition-colors duration-200"
@@ -167,6 +154,11 @@ export function Footer() {
             </a>
           </div>
         </div>
+      </div>
+
+      {/* Signature */}
+      <div className="text-center pb-4">
+        <p className="text-primary/30 text-sm italic" style={{ fontFamily: "'Permanent Marker', cursive" }}>Made by Elhajao</p>
       </div>
     </footer>
   );
