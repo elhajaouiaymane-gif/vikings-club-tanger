@@ -320,7 +320,7 @@ export default function Hero() {
         {sparkPositions.map((spark) => (
           <div
             key={spark.id}
-            className={`absolute rounded-full bg-primary hero-spark spark-${spark.dur}s spark-${spark.delay}`}
+            className={`absolute rounded-full bg-primary hero-spark spark-${spark.duration}s spark-${spark.delay}`}
             style={{
               width: `${spark.size}px`,
               height: `${spark.size}px`,
