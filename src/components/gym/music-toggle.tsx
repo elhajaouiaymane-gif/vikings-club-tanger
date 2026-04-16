@@ -58,6 +58,7 @@ function Equalizer({ playing, color, small }: { playing: boolean; color: string;
     var gap = small ? 4 : 6;
     var x0 = (w - (n * bW + (n - 1) * gap)) / 2;
     var draw = function() {
+      if (!c) return;
       c.clearRect(0, 0, w, h);
       for (var i = 0; i < n; i++) {
         if (playing) {
