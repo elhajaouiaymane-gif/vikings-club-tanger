@@ -1,0 +1,1 @@
+export { useTranslation } from '@/components/gym/i18n-provider';
