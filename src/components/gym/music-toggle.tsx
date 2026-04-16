@@ -14,9 +14,9 @@ const TRACKS = [
   { src: '/music/main4.mp3', name: 'Track 4', icon: '⚡', color: '#EAB308', theme: 'lightning' },
   { src: '/music/main5.mp3', name: 'Track 5', icon: '🐺', color: '#22C55E', theme: 'forest' },
   { src: '/music/main6.mp3', name: 'Track 6', icon: '🪓', color: '#EC4899', theme: 'blood' },
-  { src: '/music/main6b.mp3', name: 'Track 6.5', icon: '💀', color: '#F43F5E', theme: 'dark' },
-  { src: '/music/main7.mp3', name: 'Track 7', icon: '🐉', color: '#06B6D4', theme: 'ice' },
-  { src: '/music/main8.mp3', name: 'Track 8', icon: '🏴', color: '#8B5CF6', theme: 'magic' },
+  { src: '/music/main7.mp3', name: 'Track 6.5', icon: '💀', color: '#F43F5E', theme: 'dark' },
+  { src: '/music/main8.mp3', name: 'Track 7', icon: '🐉', color: '#06B6D4', theme: 'ice' },
+  { src: '/music/main9.mp3', name: 'Track 8', icon: '🏴', color: '#8B5CF6', theme: 'magic' },
 ];
 
 var _audioEl: HTMLAudioElement | null = null;
