@@ -11,14 +11,12 @@ const trustIndicators = [
   { id: 'hours', icon: Award, valueKey: 'hero_hours_value' as const, labelKey: 'hours_daily' as const },
 ];
 
-/* Glow rings — 3 concentric expanding rings */
 const glowRings = [
   { id: 'ring-1', size: 300, cls: 'hero-ring-d0 hero-ring-dur4' },
   { id: 'ring-2', size: 380, cls: 'hero-ring-d1 hero-ring-dur4' },
   { id: 'ring-3', size: 460, cls: 'hero-ring-d2 hero-ring-dur4' },
 ];
 
-/* Spark particles around the logo — deterministic */
 const sparks = [
   { id: 'spark-0', angle: 0, distance: 140, duration: 2.5, size: 2, drift: -20, delay: 'd0' },
   { id: 'spark-1', angle: 30, distance: 160, duration: 3.0, size: 3, drift: 15, delay: 'd0' },
@@ -34,13 +32,14 @@ const sparks = [
   { id: 'spark-11', angle: 330, distance: 185, duration: 3.6, size: 4, drift: 12, delay: 'd2' },
 ];
 
-const sparkPositions = sparks.map((s) => ({
-  ...s,
-  left: Math.round(Math.cos((s.angle * Math.PI) / 180) * s.distance * 100) / 100,
-  top: Math.round(Math.sin((s.angle * Math.PI) / 180) * s.distance * 100) / 100,
-}));
+const sparkPositions = sparks.map(function (s) {
+  return {
+    ...s,
+    left: Math.round(Math.cos((s.angle * Math.PI) / 180) * s.distance * 100) / 100,
+    top: Math.round(Math.sin((s.angle * Math.PI) / 180) * s.distance * 100) / 100,
+  };
+});
 
-/* Fire embers — CSS delay classes, NO inline animation styles */
 const embers = [
   { id: 'e0', left: 5, sz: 3, dur: 'dur7', delay: 'd0' },
   { id: 'e1', left: 12, sz: 2, dur: 'dur9', delay: 'd1' },
@@ -64,7 +63,6 @@ const embers = [
   { id: 'e19', left: 90, sz: 3, dur: 'dur7-3', delay: 'd0' },
 ];
 
-/* Speed lines — pre-computed endpoints, NO inline styles */
 const speedLines = [
   { id: 'l0', angle: 0, len: 350, w: 1, delay: 'd0', dur: 'dur3' },
   { id: 'l1', angle: 24, len: 280, w: 1.5, delay: 'd0', dur: 'dur3-5' },
@@ -83,8 +81,8 @@ const speedLines = [
   { id: 'l14', angle: 336, len: 350, w: 1, delay: 'd1', dur: 'dur2-8' },
 ];
 
-const slComputed = speedLines.map((l) => {
-  const rad = (l.angle * Math.PI) / 180;
+var slComputed = speedLines.map(function (l) {
+  var rad = (l.angle * Math.PI) / 180;
   return {
     ...l,
     sx: Math.round(Math.cos(rad) * 80 * 100) / 100,
@@ -94,7 +92,6 @@ const slComputed = speedLines.map((l) => {
   };
 });
 
-/* Floating particles — CSS-only delays */
 const floaters = [
   { id: 'f0', left: 12, dur: 'dur8', delay: 'd0' },
   { id: 'f1', left: 27, dur: 'dur10', delay: 'd1' },
@@ -104,98 +101,117 @@ const floaters = [
   { id: 'f5', left: 87, dur: 'dur18', delay: 'd6' },
 ];
 
-/* Eye glow — image-relative coordinates for aspect-ratio independence */
-const IMG_W = 1040;
-const IMG_H = 1546;
-const IMG_ASPECT = IMG_W / IMG_H;
-
-const EYE_IMG_Y = 0.139;
-const LEFT_EYE_IMG_X = 0.458;
-const RIGHT_EYE_IMG_X = 0.508;
-const MOBILE_BREAKPOINT = 1024;
-const MOBILE_Y_OFFSET = -0.012;
-const MOBILE_LEFT_X_OFFSET = -0.006;
-const MOBILE_RIGHT_X_OFFSET = -0.004;
+var IMG_W = 1040;
+var IMG_H = 1546;
+var IMG_ASPECT = IMG_W / IMG_H;
+var EYE_IMG_Y = 0.139;
+var LEFT_EYE_IMG_X = 0.458;
+var RIGHT_EYE_IMG_X = 0.508;
+var MOBILE_BREAKPOINT = 1024;
+var MOBILE_Y_OFFSET = -0.012;
+var MOBILE_LEFT_X_OFFSET = -0.006;
+var MOBILE_RIGHT_X_OFFSET = -0.004;
 
 export default function Hero() {
-  const sectionRef = useRef<HTMLElement>(null);
-  const [scrollY, setScrollY] = useState(0);
-  const { t } = useTranslation();
+  var sectionRef = useRef<HTMLElement>(null);
+  var warriorRef = useRef<HTMLDivElement>(null);
+  var contentRef = useRef<HTMLDivElement>(null);
+  var [isMobile, setIsMobile] = useState(false);
+  var { t } = useTranslation();
 
-  useEffect(() => {
+  /* detect mobile */
+  useEffect(function () {
+    function check() { setIsMobile(window.innerWidth < 768); }
+    check();
+    window.addEventListener('resize', check);
+    return function () { window.removeEventListener('resize', check); };
+  }, []);
+
+  /* eye position — desktop only */
+  useEffect(function () {
+    if (isMobile) return;
     function updateEyePosition() {
-      const vw = window.innerWidth;
-      const vh = window.innerHeight;
-      const vpAspect = vw / vh;
-      const isMobile = vw < MOBILE_BREAKPOINT;
-      const eyeY = EYE_IMG_Y + (isMobile ? MOBILE_Y_OFFSET : 0);
-      const leftEyeX = LEFT_EYE_IMG_X + (isMobile ? MOBILE_LEFT_X_OFFSET : 0);
-      const rightEyeX = RIGHT_EYE_IMG_X + (isMobile ? MOBILE_RIGHT_X_OFFSET : 0);
-
-      let eyeTopPx: number, leftEyePx: number, rightEyePx: number;
-
+      var vw = window.innerWidth;
+      var vh = window.innerHeight;
+      var vpAspect = vw / vh;
+      var eyeY = EYE_IMG_Y;
+      var leftEyeX = LEFT_EYE_IMG_X;
+      var rightEyeX = RIGHT_EYE_IMG_X;
+      var eyeTopPx, leftEyePx, rightEyePx;
       if (vpAspect >= IMG_ASPECT) {
-        const renderedW = vw;
-        const renderedH = vw / IMG_ASPECT;
+        var renderedW = vw;
+        var renderedH = vw / IMG_ASPECT;
         eyeTopPx = eyeY * renderedH;
         leftEyePx = leftEyeX * renderedW;
         rightEyePx = rightEyeX * renderedW;
       } else {
-        const renderedH = vh;
-        const renderedW = vh * IMG_ASPECT;
-        const offsetX = (vw - renderedW) / 2;
-        eyeTopPx = eyeY * renderedH;
-        leftEyePx = offsetX + leftEyeX * renderedW;
-        rightEyePx = offsetX + rightEyeX * renderedW;
+        var renderedH2 = vh;
+        var renderedW2 = vh * IMG_ASPECT;
+        var offsetX = (vw - renderedW2) / 2;
+        eyeTopPx = eyeY * renderedH2;
+        leftEyePx = offsetX + leftEyeX * renderedW2;
+        rightEyePx = offsetX + rightEyeX * renderedW2;
       }
-
-      document.documentElement.style.setProperty('--eye-top', `${(eyeTopPx / vh) * 100}%`);
-      document.documentElement.style.setProperty('--eye-left', `${(leftEyePx / vw) * 100}%`);
-      document.documentElement.style.setProperty('--eye-right', `${(rightEyePx / vw) * 100}%`);
+      document.documentElement.style.setProperty('--eye-top', (eyeTopPx / vh * 100) + '%');
+      document.documentElement.style.setProperty('--eye-left', (leftEyePx / vw * 100) + '%');
+      document.documentElement.style.setProperty('--eye-right', (rightEyePx / vw * 100) + '%');
     }
-
     updateEyePosition();
     window.addEventListener('resize', updateEyePosition);
-    return () => window.removeEventListener('resize', updateEyePosition);
-  }, []);
+    return function () { window.removeEventListener('resize', updateEyePosition); };
+  }, [isMobile]);
 
-  useEffect(() => {
-    const handleScroll = () => {
-      if (!sectionRef.current) return;
-      const rect = sectionRef.current.getBoundingClientRect();
-      const progress = Math.max(0, Math.min(1, -rect.top / rect.height));
-      setScrollY(progress);
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  const handleScrollTo = useCallback((href: string) => {
-    const el = document.getElementById(href);
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth' });
+  /* scroll parallax — direct DOM, ZERO React re-renders */
+  useEffect(function () {
+    if (isMobile) {
+      if (warriorRef.current) {
+        warriorRef.current.style.transform = 'translateX(-50%)';
+        warriorRef.current.style.transition = 'none';
+      }
+      if (contentRef.current) {
+        contentRef.current.style.opacity = '1';
+        contentRef.current.style.transform = 'translateY(0)';
+        contentRef.current.style.transition = 'none';
+      }
+      return;
     }
-  }, []);
+    function handleScroll() {
+      if (!sectionRef.current) return;
+      var rect = sectionRef.current.getBoundingClientRect();
+      var progress = Math.max(0, Math.min(1, -rect.top / rect.height));
 
-  const warriorTranslateY = scrollY * 80;
-  const warriorScale = 1 + scrollY * 0.15;
-  const contentOpacity = 1 - scrollY * 1.5;
-  const contentTranslateY = scrollY * -40;
+      if (warriorRef.current) {
+        warriorRef.current.style.transform = 'translateX(-50%) translateY(' + (progress * 80) + 'px) scale(' + (1 + progress * 0.15) + ')';
+      }
+
+      if (contentRef.current) {
+        contentRef.current.style.opacity = String(Math.max(0, 1 - progress * 1.5));
+        contentRef.current.style.transform = 'translateY(' + (progress * -40) + 'px)';
+      }
+    }
+    if (warriorRef.current) {
+      warriorRef.current.style.transition = 'transform 0.1s linear';
+    }
+    if (contentRef.current) {
+      contentRef.current.style.transition = 'opacity 0.1s linear, transform 0.1s linear';
+    }
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return function () { window.removeEventListener('scroll', handleScroll); };
+  }, [isMobile]);
+
+  var handleScrollTo = useCallback(function (href: string) {
+    var el = document.getElementById(href);
+    if (el) el.scrollIntoView({ behavior: 'smooth' });
+  }, []);
 
   return (
-    <section
-      id="home"
-      ref={sectionRef}
-      className="relative min-h-screen flex items-center justify-center overflow-hidden"
-    >
-      {/* ===== BACKGROUND: Pure dark ===== */}
+    <section id="home" ref={sectionRef} className="relative min-h-screen flex items-center justify-center overflow-hidden">
       <div className="absolute inset-0 z-0 bg-background">
         <div className="absolute inset-x-0 top-0 h-64 bg-gradient-to-b from-background via-transparent to-transparent" />
         <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-background to-transparent" />
       </div>
 
-      {/* ===== BACKGROUND LAYERS ===== */}
+      {/* All background layers — kept for both */}
       <div className="absolute inset-0 z-[1] pointer-events-none hero-bg-grain" />
       <div className="absolute inset-0 z-[1] pointer-events-none hero-bg-split" />
       <div className="absolute inset-0 z-[1] pointer-events-none hero-smoke-full-1" />
@@ -204,31 +220,22 @@ export default function Hero() {
       <div className="absolute inset-0 z-[1] pointer-events-none hero-bg-runes" />
       <div className="hero-rune-symbol" />
 
-      {/* Center glows */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] sm:w-[600px] sm:h-[600px] lg:w-[900px] lg:h-[900px] rounded-full opacity-50 z-0 pointer-events-none hero-glow-primary" />
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200px] h-[200px] sm:w-[400px] sm:h-[400px] lg:w-[600px] lg:h-[600px] rounded-full opacity-30 z-0 pointer-events-none hero-glow-secondary" />
 
-      {/* ===== VIKING WARRIOR ===== */}
-      <div
-        className="mobile-warrior-center"
-        aria-hidden="true"
-        style={{
-          transform: `translateX(-50%) translateY(${warriorTranslateY}px) scale(${warriorScale})`,
-          transition: 'transform 0.1s linear',
-        }}
-      >
+      {/* VIKING WARRIOR — ref-based, no state */}
+      <div ref={warriorRef} className="mobile-warrior-center" aria-hidden="true" style={{ transform: 'translateX(-50%)' }}>
         <div className="mobile-warrior-heat" />
-        <div className="mobile-warrior-eye mobile-warrior-eye-left" />
-        <div className="mobile-warrior-eye mobile-warrior-eye-right" />
+        {!isMobile && (
+          <>
+            <div className="mobile-warrior-eye mobile-warrior-eye-left" />
+            <div className="mobile-warrior-eye mobile-warrior-eye-right" />
+          </>
+        )}
         <div className="mobile-warrior-lightning mobile-warrior-lightning-1" />
         <div className="mobile-warrior-lightning mobile-warrior-lightning-2" />
         <div className="mobile-warrior-lightning mobile-warrior-lightning-3" />
-        <img
-          src="/viking-warrior.png"
-          alt=""
-          className="mobile-warrior-center-img"
-          draggable={false}
-        />
+        <img src="/viking-warrior.png" alt="" className="mobile-warrior-center-img" draggable={false} />
         <div className="mobile-ember mobile-ember-1" />
         <div className="mobile-ember mobile-ember-2" />
         <div className="mobile-ember mobile-ember-3" />
@@ -239,136 +246,74 @@ export default function Hero() {
         <div className="mobile-ember mobile-ember-8" />
       </div>
 
-      {/* ===== FIRE EMBERS ===== */}
+      {/* All embers — kept */}
       <div className="absolute inset-0 z-[1] pointer-events-none overflow-hidden">
-        {embers.map((e) => (
-          <div
-            key={e.id}
-            className={`absolute rounded-full ember-particle ember-${e.dur} ember-${e.delay}`}
-            style={{ left: `${e.left}%`, bottom: '-10px', width: e.sz, height: e.sz }}
-          />
-        ))}
+        {embers.map(function (e) {
+          return <div key={e.id} className={'absolute rounded-full ember-particle ember-' + e.dur + ' ember-' + e.delay} style={{ left: e.left + '%', bottom: '-10px', width: e.sz, height: e.sz }} />;
+        })}
       </div>
 
-      {/* ===== SPEED LINES (SVG) ===== */}
-      <svg
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[1] pointer-events-none"
-        width="1000"
-        height="1000"
-        viewBox="-500 -500 1000 1000"
-      >
+      {/* Speed lines — kept */}
+      <svg className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[1] pointer-events-none" width="1000" height="1000" viewBox="-500 -500 1000 1000">
         <defs>
           <linearGradient id="rayGrad" x1="0%" y1="0%" x2="100%" y2="0%">
             <stop offset="0%" stopColor="#c2651a" stopOpacity="0.6" />
             <stop offset="100%" stopColor="#c2651a" stopOpacity="0" />
           </linearGradient>
         </defs>
-        {slComputed.map((l) => (
-          <line
-            key={l.id}
-            x1={l.sx}
-            y1={l.sy}
-            x2={l.ex}
-            y2={l.ey}
-            className={`speed-line sl-${l.dur} sl-${l.delay}`}
-            strokeWidth={l.w}
-            strokeLinecap="round"
-          />
-        ))}
+        {slComputed.map(function (l) {
+          return <line key={l.id} x1={l.sx} y1={l.sy} x2={l.ex} y2={l.ey} className={'speed-line sl-' + l.dur + ' sl-' + l.delay} strokeWidth={l.w} strokeLinecap="round" />;
+        })}
       </svg>
 
-      {/* ===== BOTTOM FOG ===== */}
+      {/* All fog layers — kept */}
       <div className="absolute bottom-0 left-0 right-0 h-[40vh] z-[1] pointer-events-none overflow-hidden">
         <div className="fog-layer-1 absolute bottom-0 left-[-10%] right-[-10%] h-[300px]" />
         <div className="fog-layer-2 absolute bottom-[-5%] left-[-10%] right-[-10%] h-[250px]" />
         <div className="fog-layer-3 absolute bottom-[-10%] left-[10%] right-[10%] h-[200px]" />
       </div>
 
-      {/* ===== ROTATING LIGHT RAYS ===== */}
+      {/* Rotating rays — kept */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[1] pointer-events-none hero-rays-spin">
-        <svg
-          width="800"
-          height="800"
-          viewBox="0 0 800 800"
-          className="opacity-20 hero-rays-blur"
-        >
-          {Array.from({ length: 12 }).map((_, i) => (
-            <polygon
-              key={`ray-${i}`}
-              points="400,400 395,0 405,0"
-              fill="url(#rayGrad)"
-              transform={`rotate(${i * 30} 400 400)`}
-              opacity={0.3 + (i % 3) * 0.15}
-            />
-          ))}
+        <svg width="800" height="800" viewBox="0 0 800 800" className="opacity-20 hero-rays-blur">
+          {Array.from({ length: 12 }).map(function (_, i) {
+            return <polygon key={'ray-' + i} points="400,400 395,0 405,0" fill="url(#rayGrad)" transform={'rotate(' + (i * 30) + ' 400 400)'} opacity={0.3 + (i % 3) * 0.15} />;
+          })}
         </svg>
       </div>
 
-      {/* ===== EXPANDING GLOW RINGS ===== */}
+      {/* Glow rings — kept */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[2] pointer-events-none">
-        {glowRings.map((ring) => (
-          <div
-            key={ring.id}
-            className={`absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-primary/30 ${ring.cls}`}
-            style={{ width: ring.size, height: ring.size }}
-          />
-        ))}
+        {glowRings.map(function (ring) {
+          return <div key={ring.id} className={'absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-primary/30 ' + ring.cls} style={{ width: ring.size, height: ring.size }} />;
+        })}
       </div>
 
-      {/* ===== SPARK PARTICLES ===== */}
+      {/* Spark particles — kept */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[3] pointer-events-none">
-        {sparkPositions.map((spark) => (
-          <div
-            key={spark.id}
-            className={`absolute rounded-full bg-primary hero-spark spark-${spark.duration}s spark-${spark.delay}`}
-            style={{
-              width: `${spark.size}px`,
-              height: `${spark.size}px`,
-              left: `${spark.left}px`,
-              top: `${spark.top}px`,
-              '--spark-drift': `${spark.drift}px`,
-              '--spark-shadow-size': `${spark.size * 3}px`,
-            } as React.CSSProperties}
-          />
-        ))}
+        {sparkPositions.map(function (spark) {
+          return <div key={spark.id} className={'absolute rounded-full bg-primary hero-spark spark-' + spark.duration + 's spark-' + spark.delay} style={{ width: spark.size + 'px', height: spark.size + 'px', left: spark.left + 'px', top: spark.top + 'px', '--spark-drift': spark.drift + 'px', '--spark-shadow-size': (spark.size * 3) + 'px' } as React.CSSProperties} />;
+        })}
       </div>
 
-      {/* ===== FLOATING PARTICLES ===== */}
+      {/* Floating particles — kept */}
       <div className="absolute inset-0 z-[1] pointer-events-none overflow-hidden">
-        {floaters.map((f) => (
-          <div
-            key={f.id}
-            className={`absolute w-1 h-1 rounded-full bg-primary/30 particle-${f.dur} particle-${f.delay}`}
-            style={{ left: `${f.left}%`, bottom: '-10px' }}
-          />
-        ))}
+        {floaters.map(function (f) {
+          return <div key={f.id} className={'absolute w-1 h-1 rounded-full bg-primary/30 particle-' + f.dur + ' particle-' + f.delay} style={{ left: f.left + '%', bottom: '-10px' }} />;
+        })}
       </div>
 
-      {/* ===== CONTENT with parallax fade ===== */}
-      <div
-        className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-20 pb-16 text-center"
-        style={{
-          opacity: Math.max(0, contentOpacity),
-          transform: `translateY(${contentTranslateY}px)`,
-          transition: 'opacity 0.1s linear, transform 0.1s linear',
-        }}
-      >
+      {/* CONTENT — ref-based, no state */}
+      <div ref={contentRef} className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-20 pb-16 text-center">
         <div className="mb-12">
           <div className="relative inline-block">
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[100px] sm:w-[400px] sm:h-[160px] md:w-[500px] md:h-[200px] rounded-full -z-10 hero-logo-glow" />
-            <img
-              src="/gym-logo.png"
-              alt="Vikings Club Tanger"
-              width={480}
-              height={160}
-              className="w-[280px] sm:w-[340px] md:w-[400px] lg:w-[480px] h-auto animate-hero-logo"
-            />
+            <img src="/gym-logo.png" alt="Vikings Club Tanger" width={480} height={160} className="w-[280px] sm:w-[340px] md:w-[400px] lg:w-[480px] h-auto animate-hero-logo" />
           </div>
         </div>
 
         <div className="space-y-4">
           <h1>
-            {/* TRAIN LIKE A VIKING — brand slogan, never translated */}
             <span className="block text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold tracking-[0.25em] sm:tracking-[0.3em] text-foreground/80 animate-fade-in-up delay-500 viking-subtitle">
               TRAIN LIKE A
             </span>
@@ -386,11 +331,7 @@ export default function Hero() {
         </div>
 
         <div data-pub-hide className="animate-fade-in-up delay-800 mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-          <Button
-            onClick={() => handleScrollTo('pricing')}
-            size="lg"
-            className="btn-primary text-white font-semibold rounded-lg px-8 h-12 text-base animate-pulse-red"
-          >
+          <Button onClick={function () { handleScrollTo('pricing'); }} size="lg" className="btn-primary text-white font-semibold rounded-lg px-8 h-12 text-base animate-pulse-red">
             {t('start_journey')}
             <ArrowRight className="size-4" />
           </Button>
@@ -398,32 +339,25 @@ export default function Hero() {
 
         <div data-pub-hide className="animate-fade-in-up mt-16 sm:mt-20 delay-1000">
           <div className="glass-card inline-flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-0 rounded-2xl px-6 py-5 sm:px-12 sm:divide-x sm:divide-border/20">
-            {trustIndicators.map((item) => (
-              <div key={item.id} className="flex items-center gap-3 px-4 sm:px-8">
-                <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/15 border border-primary/20">
-                  <item.icon className="size-5 text-primary" />
+            {trustIndicators.map(function (item) {
+              return (
+                <div key={item.id} className="flex items-center gap-3 px-4 sm:px-8">
+                  <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/15 border border-primary/20">
+                    <item.icon className="size-5 text-primary" />
+                  </div>
+                  <div className="text-left">
+                    <p className="text-lg sm:text-xl font-bold text-foreground stat-glow">{t(item.valueKey)}</p>
+                    <p className="text-xs sm:text-sm text-muted-foreground">{t(item.labelKey as keyof import('@/lib/translations').TranslationKeys)}</p>
+                  </div>
                 </div>
-                <div className="text-left">
-                  <p className="text-lg sm:text-xl font-bold text-foreground stat-glow">
-                    {t(item.valueKey)}
-                  </p>
-                  <p className="text-xs sm:text-sm text-muted-foreground">
-                    {t(item.labelKey as keyof import('@/lib/translations').TranslationKeys)}
-                  </p>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </div>
 
-      {/* Bottom scroll indicator */}
       <div data-pub-hide className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 animate-fade-in delay-1200">
-        <button
-          onClick={() => handleScrollTo('about')}
-          className="flex flex-col items-center gap-2 text-muted-foreground hover:text-primary transition-colors duration-300"
-          aria-label="Scroll to about section"
-        >
+        <button onClick={function () { handleScrollTo('about'); }} className="flex flex-col items-center gap-2 text-muted-foreground hover:text-primary transition-colors duration-300" aria-label="Scroll to about section">
           <span className="text-xs uppercase tracking-widest font-medium">Scroll</span>
           <div className="h-10 w-6 rounded-full border-2 border-current p-1">
             <div className="h-2 w-full rounded-full bg-current animate-bounce" />
