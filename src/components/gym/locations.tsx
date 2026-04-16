@@ -32,8 +32,8 @@ const branches: Branch[] = [
     address: 'Sahat Al Madina, Tangier',
     lat: 35.7873,
     lng: -5.8179,
-    mapsUrl: 'https://maps.app.goo.gl/aePHaegRpa4sFRvm8',
-    mapsEmbed: 'https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&q=Vikings+Club+Tanger+Sahat+Al+Madina+Tangier+Morocco&zoom=15',
+    mapsUrl: 'https://maps.app.goo.gl/Mt5wmHa8NQM78rkM9',
+    mapsEmbed: 'https://maps.google.com/maps?q=35.7873,-5.8179&z=16&output=embed',
     badge: '',
     badgeColor: '',
   },
@@ -44,8 +44,8 @@ const branches: Branch[] = [
     address: 'Mesnana, Qouasem, Tangier',
     lat: 35.767,
     lng: -5.835,
-    mapsUrl: 'https://maps.app.goo.gl/QUjLGETtyvZkwxvG8',
-    mapsEmbed: 'https://www.google.com/maps/embed/v1/place?key=AIzaSyBFw0Qbyq9zTFTd-tUY6dZWTgaQzuU17R8&q=Vikings+Club+2+Mesnana+Qouasem+Tangier+Morocco&zoom=15',
+    mapsUrl: 'https://maps.app.goo.gl/MUHsAPWeKtex4BfK8',
+    mapsEmbed: 'https://maps.google.com/maps?q=35.767,-5.835&z=16&output=embed',
     badge: 'NEW',
     badgeColor: 'bg-emerald-500',
   },
@@ -150,14 +150,13 @@ export default function Locations({ selectedPlan }: { selectedPlan: SelectedPlan
 
   const getDirectionsUrl = (branch: Branch) => {
     if (userCoords) {
-      return `https://www.google.com/maps/dir/?api=1&origin=${userCoords.lat},${userCoords.lng}&destination=Vikings+Club+Tanger+${encodeURIComponent(branch.address)}`;
+      return `https://www.google.com/maps/dir/?api=1&origin=${userCoords.lat},${userCoords.lng}&destination=${branch.lat},${branch.lng}`;
     }
     return branch.mapsUrl;
   };
 
   return (
     <section id="locations" ref={sectionRef} className="relative py-16 px-4 md:px-8 bg-background overflow-hidden">
-      {/* Subtle glow */}
       <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-[500px] h-[300px] bg-primary/5 rounded-full blur-3xl pointer-events-none" />
 
       <div className="relative z-10 max-w-6xl mx-auto">

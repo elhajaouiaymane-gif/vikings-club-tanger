@@ -17,7 +17,6 @@ import FAQ from '@/components/gym/faq';
 import Locations from '@/components/gym/locations';
 import { Footer } from '@/components/gym/footer';
 import { ContactModal } from '@/components/gym/contact-modal';
-import ScrollProgress from '@/components/gym/scroll-progress';
 import WhatsAppButton from '@/components/gym/whatsapp-button';
 import AIChat from '@/components/gym/ai-chat';
 import MusicToggle from '@/components/gym/music-toggle';
@@ -59,32 +58,19 @@ function VikingLoadingScreen({ visible, onEnter }: { visible: boolean; onEnter: 
     >
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
         <div className="absolute w-[600px] h-[600px] rounded-full opacity-[0.03]" style={{ background: 'radial-gradient(circle, #F97316, transparent)', top: '20%', left: '50%', transform: 'translateX(-50%)', animation: 'pulse 4s ease-in-out infinite' }} />
-        <div className="absolute w-[400px] h-[400px] rounded-full opacity-[0.05]" style={{ background: 'radial-gradient(circle, #F97316, transparent)', bottom: '10%', right: '10%', animation: 'pulse 6s ease-in-out infinite reverse' }} />
       </div>
 
       <div className="relative w-44 h-44 sm:w-56 sm:h-56 mb-8">
         <div className="absolute inset-0 rounded-full border-2 border-primary/20" style={{ animation: 'spin 12s linear infinite' }} />
-        {Array.from({ length: 12 }).map(function (_, i) {
-          return <div key={'r1-' + i} className="absolute w-1.5 h-1.5 rounded-full bg-primary/50" style={{ top: '50%', left: '50%', transform: 'rotate(' + (i * 30) + 'deg) translateY(-96px) translate(-50%, -50%)', opacity: 0.3 + (i % 3) * 0.25 }} />;
+        {Array.from({ length: 6 }).map(function (_, i) {
+          return <div key={'r1-' + i} className="absolute w-1.5 h-1.5 rounded-full bg-primary/50" style={{ top: '50%', left: '50%', transform: 'rotate(' + (i * 60) + 'deg) translateY(-96px) translate(-50%, -50%)' }} />;
         })}
         <div className="absolute inset-5 rounded-full border border-primary/25" style={{ animation: 'spin 8s linear infinite reverse' }} />
-        {Array.from({ length: 8 }).map(function (_, i) {
-          return <div key={'r2-' + i} className="absolute w-2 h-2 rounded-full bg-primary/40" style={{ top: '50%', left: '50%', transform: 'rotate(' + (i * 45) + 'deg) translateY(-66px) translate(-50%, -50%)', animation: 'pulse 2s ease-in-out infinite', animationDelay: (i * 0.3) + 's' }} />;
-        })}
-        <div className="absolute inset-10 rounded-full border border-primary/35" style={{ animation: 'spin 5s linear infinite' }} />
-        <div className="absolute inset-16 rounded-full border border-primary/15" style={{ animation: 'spin 3s linear infinite reverse' }} />
         <div className="absolute inset-0 flex items-center justify-center z-10">
-          <div style={{ animation: 'logoFloat 3s ease-in-out infinite' }}>
-            <img src="/gym-logo.png" alt="" className="w-28 sm:w-36 h-auto drop-shadow-[0_0_40px_rgba(249,115,22,0.4)]" />
-          </div>
+          <img src="/gym-logo.png" alt="" className="w-28 sm:w-36 h-auto drop-shadow-[0_0_40px_rgba(249,115,22,0.4)]" />
         </div>
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
           <div className="w-40 h-40 sm:w-48 sm:h-48 rounded-full bg-primary/10 blur-3xl animate-pulse" />
-        </div>
-        <div className="absolute inset-0 flex items-center justify-center pointer-events-none" style={{ animation: 'spin 20s linear infinite' }}>
-          {['ᚠ', 'ᚢ', 'ᚦ', 'ᚨ', 'ᚱ', 'ᚲ'].map(function (rune, i) {
-            return <span key={rune} className="absolute text-primary/20 text-sm sm:text-base font-bold" style={{ top: '50%', left: '50%', transform: 'rotate(' + (i * 60) + 'deg) translateY(-108px) translate(-50%, -50%)' }}>{rune}</span>;
-          })}
         </div>
       </div>
 
@@ -96,11 +82,8 @@ function VikingLoadingScreen({ visible, onEnter }: { visible: boolean; onEnter: 
           ⚔️ Tap to Enter ⚔️
         </div>
         <p className="text-white/15 text-[9px] tracking-[0.3em] uppercase">or press any key</p>
+        <p className="text-primary/30 text-sm mt-3 italic" style={{ fontFamily: "'Permanent Marker', cursive" }}>Made by @elhajao</p>
       </div>
-
-      {Array.from({ length: 15 }).map(function (_, i) {
-        return <div key={'p-' + i} className="absolute rounded-full bg-primary/40" style={{ width: (1 + Math.random() * 2) + 'px', height: (1 + Math.random() * 2) + 'px', left: (Math.random() * 100) + '%', bottom: '-5%', animation: 'emberRise ' + (8 + Math.random() * 12) + 's ease-in infinite', animationDelay: (Math.random() * 10) + 's', opacity: 0.2 + Math.random() * 0.4 }} />;
-      })}
 
       <div className="absolute bottom-8 left-1/2 -translate-x-1/2 w-32 h-px bg-gradient-to-r from-transparent via-primary/20 to-transparent" />
     </div>
@@ -152,11 +135,8 @@ export default function Home() {
     <div className="min-h-screen flex flex-col">
       <VikingLoadingScreen visible={!loadingDone} onEnter={handleEnter} />
 
-      {loadingDone && {/* <MusicVibe /> */ }}
-
       <div className="flex flex-col min-h-screen" style={{ opacity: loadingDone ? 1 : 0, transition: 'opacity 0.6s ease' }}>
-        {!isPublication && <ScrollProgress />}
-        {!isPublication && <Navbar />}
+        <Navbar />
         <main className={'flex-1 ' + (isPublication ? 'publication-mode' : '')}>
           <Hero />
           <Stats />
