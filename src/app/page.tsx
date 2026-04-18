@@ -129,32 +129,6 @@ function PubToggle({ isPub, onToggle }: { isPub: boolean; onToggle: () => void }
   );
 }
 
-/* ── GLOBAL MOBILE SCROLL OPTIMIZATION ── */
-function GlobalScrollOptimizer() {
-  useEffect(function () {
-    if (typeof window === 'undefined') return;
-    if (window.innerWidth >= 768) return;
-
-    var timeout: ReturnType<typeof setTimeout> | null = null;
-
-    function onScroll() {
-      document.body.classList.add('is-scrolling');
-      if (timeout) clearTimeout(timeout);
-      timeout = setTimeout(function () {
-        document.body.classList.remove('is-scrolling');
-      }, 150);
-    }
-
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return function () {
-      window.removeEventListener('scroll', onScroll);
-      if (timeout) clearTimeout(timeout);
-    };
-  }, []);
-
-  return null;
-}
-
 export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<'join' | 'contact'>('join');
@@ -184,17 +158,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      {/* Global CSS — pause ALL animations on mobile while scrolling */}
-      <style dangerouslySetInnerHTML={{ __html: `
-        .is-scrolling *,
-        .is-scrolling *::before,
-        .is-scrolling *::after {
-          animation-play-state: paused !important;
-          transition-duration: 0s !important;
-        }
-      ` }} />
-
-      <GlobalScrollOptimizer />
       <VikingLoadingScreen visible={!loadingDone} onEnter={handleEnter} />
 
       <div className={'flex flex-col min-h-screen ' + (isPublication ? 'publication-mode' : '')} style={{ opacity: loadingDone ? 1 : 0, transition: 'opacity 0.6s ease' }}>
