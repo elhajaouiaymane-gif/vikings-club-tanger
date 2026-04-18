@@ -59,7 +59,6 @@ export default function ExtraCTA() {
         </div>
 
         <div className="mt-10 flex items-center justify-center gap-6 text-white/40 text-sm">
-          <span>✅ Free First Session</span>
           <span>✅ No Commitment</span>
           <span>✅ Expert Coaches</span>
         </div>

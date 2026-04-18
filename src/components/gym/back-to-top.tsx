@@ -12,7 +12,14 @@ export default function BackToTop() {
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
 
-  const scrollToTop = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+  const scrollToTop = () => {
+    /* instant on mobile to avoid crash, smooth on desktop */
+    if (window.innerWidth < 768) {
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    } else {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  };
 
   return (
     <button

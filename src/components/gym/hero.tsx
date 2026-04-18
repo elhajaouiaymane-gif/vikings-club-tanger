@@ -112,6 +112,14 @@ var MOBILE_Y_OFFSET = -0.012;
 var MOBILE_LEFT_X_OFFSET = -0.006;
 var MOBILE_RIGHT_X_OFFSET = -0.004;
 
+/* ★ mobile reduced counts — same look, less GPU ★ */
+var MOBILE_EMBERS = 8;
+var MOBILE_SPARKS = 5;
+var MOBILE_LINES = 6;
+var MOBILE_FLOATERS = 3;
+var MOBILE_RINGS = 2;
+var MOBILE_WARRIOR_EMBERS = 4;
+
 export default function Hero() {
   var sectionRef = useRef<HTMLElement>(null);
   var warriorRef = useRef<HTMLDivElement>(null);
@@ -199,7 +207,7 @@ export default function Hero() {
     return function () { window.removeEventListener('scroll', handleScroll); };
   }, [isMobile]);
 
-  /* ★ MOBILE SCROLL OPTIMIZATION — pause animations during scroll ★ */
+  /* ★ MOBILE SCROLL — pause animations while scrolling ★ */
   useEffect(function () {
     if (!isMobile) return;
     var timeout: ReturnType<typeof setTimeout> | null = null;
@@ -228,9 +236,17 @@ export default function Hero() {
     if (el) el.scrollIntoView({ behavior: 'smooth' });
   }, []);
 
+  /* ★ pick counts based on device ★ */
+  var mc = isMobile;
+  var activeEmbers = mc ? embers.slice(0, MOBILE_EMBERS) : embers;
+  var activeSparks = mc ? sparkPositions.slice(0, MOBILE_SPARKS) : sparkPositions;
+  var activeLines = mc ? slComputed.slice(0, MOBILE_LINES) : slComputed;
+  var activeFloaters = mc ? floaters.slice(0, MOBILE_FLOATERS) : floaters;
+  var activeRings = mc ? glowRings.slice(0, MOBILE_RINGS) : glowRings;
+  var warriorEmberCount = mc ? MOBILE_WARRIOR_EMBERS : 8;
+
   return (
     <>
-      {/* Injected CSS — pauses animations while scrolling on mobile */}
       <style dangerouslySetInnerHTML={{ __html: `
         .hero-scrolling .ember-particle,
         .hero-scrolling .hero-spark,
@@ -264,7 +280,7 @@ export default function Hero() {
           <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-background to-transparent" />
         </div>
 
-        {/* All background layers — kept for both */}
+        {/* Background layers */}
         <div className="absolute inset-0 z-[1] pointer-events-none hero-bg-grain" />
         <div className="absolute inset-0 z-[1] pointer-events-none hero-bg-split" />
         <div className="absolute inset-0 z-[1] pointer-events-none hero-smoke-full-1" />
@@ -276,10 +292,10 @@ export default function Hero() {
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] sm:w-[600px] sm:h-[600px] lg:w-[900px] lg:h-[900px] rounded-full opacity-50 z-0 pointer-events-none hero-glow-primary" />
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200px] h-[200px] sm:w-[400px] sm:h-[400px] lg:w-[600px] lg:h-[600px] rounded-full opacity-30 z-0 pointer-events-none hero-glow-secondary" />
 
-        {/* VIKING WARRIOR — ref-based, no state */}
+        {/* VIKING WARRIOR */}
         <div ref={warriorRef} className="mobile-warrior-center" aria-hidden="true" style={{ transform: 'translateX(-50%)' }}>
           <div className="mobile-warrior-heat" />
-          {!isMobile && (
+          {!mc && (
             <>
               <div className="mobile-warrior-eye mobile-warrior-eye-left" />
               <div className="mobile-warrior-eye mobile-warrior-eye-right" />
@@ -289,24 +305,19 @@ export default function Hero() {
           <div className="mobile-warrior-lightning mobile-warrior-lightning-2" />
           <div className="mobile-warrior-lightning mobile-warrior-lightning-3" />
           <img src="/viking-warrior.png" alt="" className="mobile-warrior-center-img" draggable={false} />
-          <div className="mobile-ember mobile-ember-1" />
-          <div className="mobile-ember mobile-ember-2" />
-          <div className="mobile-ember mobile-ember-3" />
-          <div className="mobile-ember mobile-ember-4" />
-          <div className="mobile-ember mobile-ember-5" />
-          <div className="mobile-ember mobile-ember-6" />
-          <div className="mobile-ember mobile-ember-7" />
-          <div className="mobile-ember mobile-ember-8" />
+          {Array.from({ length: warriorEmberCount }).map(function (_, i) {
+            return <div key={'we-' + i} className={'mobile-ember mobile-ember-' + (i + 1)} />;
+          })}
         </div>
 
-        {/* All embers — kept */}
+        {/* Embers — reduced on mobile */}
         <div className="absolute inset-0 z-[1] pointer-events-none overflow-hidden">
-          {embers.map(function (e) {
+          {activeEmbers.map(function (e) {
             return <div key={e.id} className={'absolute rounded-full ember-particle ember-' + e.dur + ' ember-' + e.delay} style={{ left: e.left + '%', bottom: '-10px', width: e.sz, height: e.sz }} />;
           })}
         </div>
 
-        {/* Speed lines — kept */}
+        {/* Speed lines — reduced on mobile */}
         <svg className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[1] pointer-events-none" width="1000" height="1000" viewBox="-500 -500 1000 1000">
           <defs>
             <linearGradient id="rayGrad" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -314,49 +325,51 @@ export default function Hero() {
               <stop offset="100%" stopColor="#c2651a" stopOpacity="0" />
             </linearGradient>
           </defs>
-          {slComputed.map(function (l) {
+          {activeLines.map(function (l) {
             return <line key={l.id} x1={l.sx} y1={l.sy} x2={l.ex} y2={l.ey} className={'speed-line sl-' + l.dur + ' sl-' + l.delay} strokeWidth={l.w} strokeLinecap="round" />;
           })}
         </svg>
 
-        {/* All fog layers — kept */}
+        {/* Fog layers */}
         <div className="absolute bottom-0 left-0 right-0 h-[40vh] z-[1] pointer-events-none overflow-hidden">
           <div className="fog-layer-1 absolute bottom-0 left-[-10%] right-[-10%] h-[300px]" />
           <div className="fog-layer-2 absolute bottom-[-5%] left-[-10%] right-[-10%] h-[250px]" />
           <div className="fog-layer-3 absolute bottom-[-10%] left-[10%] right-[10%] h-[200px]" />
         </div>
 
-        {/* Rotating rays — kept */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[1] pointer-events-none hero-rays-spin">
-          <svg width="800" height="800" viewBox="0 0 800 800" className="opacity-20 hero-rays-blur">
-            {Array.from({ length: 12 }).map(function (_, i) {
-              return <polygon key={'ray-' + i} points="400,400 395,0 405,0" fill="url(#rayGrad)" transform={'rotate(' + (i * 30) + ' 400 400)'} opacity={0.3 + (i % 3) * 0.15} />;
-            })}
-          </svg>
-        </div>
+        {/* Rotating rays — desktop only */}
+        {!mc && (
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[1] pointer-events-none hero-rays-spin">
+            <svg width="800" height="800" viewBox="0 0 800 800" className="opacity-20 hero-rays-blur">
+              {Array.from({ length: 12 }).map(function (_, i) {
+                return <polygon key={'ray-' + i} points="400,400 395,0 405,0" fill="url(#rayGrad)" transform={'rotate(' + (i * 30) + ' 400 400)'} opacity={0.3 + (i % 3) * 0.15} />;
+              })}
+            </svg>
+          </div>
+        )}
 
-        {/* Glow rings — kept */}
+        {/* Glow rings — reduced on mobile */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[2] pointer-events-none">
-          {glowRings.map(function (ring) {
+          {activeRings.map(function (ring) {
             return <div key={ring.id} className={'absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-primary/30 ' + ring.cls} style={{ width: ring.size, height: ring.size }} />;
           })}
         </div>
 
-        {/* Spark particles — kept */}
+        {/* Spark particles — reduced on mobile */}
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[3] pointer-events-none">
-          {sparkPositions.map(function (spark) {
+          {activeSparks.map(function (spark) {
             return <div key={spark.id} className={'absolute rounded-full bg-primary hero-spark spark-' + spark.duration + 's spark-' + spark.delay} style={{ width: spark.size + 'px', height: spark.size + 'px', left: spark.left + 'px', top: spark.top + 'px', '--spark-drift': spark.drift + 'px', '--spark-shadow-size': (spark.size * 3) + 'px' } as React.CSSProperties} />;
           })}
         </div>
 
-        {/* Floating particles — kept */}
+        {/* Floating particles — reduced on mobile */}
         <div className="absolute inset-0 z-[1] pointer-events-none overflow-hidden">
-          {floaters.map(function (f) {
+          {activeFloaters.map(function (f) {
             return <div key={f.id} className={'absolute w-1 h-1 rounded-full bg-primary/30 particle-' + f.dur + ' particle-' + f.delay} style={{ left: f.left + '%', bottom: '-10px' }} />;
           })}
         </div>
 
-        {/* CONTENT — ref-based, no state */}
+        {/* CONTENT */}
         <div ref={contentRef} className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-20 pb-16 text-center">
           <div className="mb-12">
             <div className="relative inline-block">
