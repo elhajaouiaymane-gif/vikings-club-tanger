@@ -25,7 +25,6 @@ import BackToTop from '@/components/gym/back-to-top';
 import { startMusic } from '@/components/gym/music-toggle';
 import { BookOpen, Eye, EyeOff } from 'lucide-react';
 
-/* ── VIKING LOADING SCREEN ── */
 function VikingLoadingScreen({ visible, onEnter }: { visible: boolean; onEnter: () => void }) {
   const [fading, setFading] = useState(false);
   const entered = useRef(false);
@@ -88,7 +87,6 @@ function VikingLoadingScreen({ visible, onEnter }: { visible: boolean; onEnter: 
   );
 }
 
-/* ── PUBLICATION TOGGLE ── */
 function PubToggle({ isPub, onToggle }: { isPub: boolean; onToggle: () => void }) {
   return (
     <button

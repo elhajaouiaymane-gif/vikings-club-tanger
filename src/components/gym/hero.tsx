@@ -107,16 +107,12 @@ var IMG_ASPECT = IMG_W / IMG_H;
 var EYE_IMG_Y = 0.139;
 var LEFT_EYE_IMG_X = 0.458;
 var RIGHT_EYE_IMG_X = 0.508;
-var MOBILE_BREAKPOINT = 1024;
-var MOBILE_Y_OFFSET = -0.012;
-var MOBILE_LEFT_X_OFFSET = -0.006;
-var MOBILE_RIGHT_X_OFFSET = -0.004;
 
-/* ★ mobile reduced counts — same look, less GPU ★ */
-var MOBILE_EMBERS = 8;
-var MOBILE_SPARKS = 5;
-var MOBILE_LINES = 6;
-var MOBILE_FLOATERS = 3;
+/* ★ mobile reduced counts ★ */
+var MOBILE_EMBERS = 6;
+var MOBILE_SPARKS = 4;
+var MOBILE_LINES = 5;
+var MOBILE_FLOATERS = 2;
 var MOBILE_RINGS = 2;
 var MOBILE_WARRIOR_EMBERS = 4;
 
@@ -169,66 +165,25 @@ export default function Hero() {
     return function () { window.removeEventListener('resize', updateEyePosition); };
   }, [isMobile]);
 
-  /* scroll parallax — direct DOM, ZERO React re-renders */
+  /* scroll parallax — desktop only, direct DOM */
   useEffect(function () {
-    if (isMobile) {
-      if (warriorRef.current) {
-        warriorRef.current.style.transform = 'translateX(-50%)';
-        warriorRef.current.style.transition = 'none';
-      }
-      if (contentRef.current) {
-        contentRef.current.style.opacity = '1';
-        contentRef.current.style.transform = 'translateY(0)';
-        contentRef.current.style.transition = 'none';
-      }
-      return;
-    }
+    if (isMobile) return;
     function handleScroll() {
       if (!sectionRef.current) return;
       var rect = sectionRef.current.getBoundingClientRect();
       var progress = Math.max(0, Math.min(1, -rect.top / rect.height));
-
       if (warriorRef.current) {
         warriorRef.current.style.transform = 'translateX(-50%) translateY(' + (progress * 80) + 'px) scale(' + (1 + progress * 0.15) + ')';
       }
-
       if (contentRef.current) {
         contentRef.current.style.opacity = String(Math.max(0, 1 - progress * 1.5));
         contentRef.current.style.transform = 'translateY(' + (progress * -40) + 'px)';
       }
     }
-    if (warriorRef.current) {
-      warriorRef.current.style.transition = 'transform 0.1s linear';
-    }
-    if (contentRef.current) {
-      contentRef.current.style.transition = 'opacity 0.1s linear, transform 0.1s linear';
-    }
+    if (warriorRef.current) warriorRef.current.style.transition = 'transform 0.1s linear';
+    if (contentRef.current) contentRef.current.style.transition = 'opacity 0.1s linear, transform 0.1s linear';
     window.addEventListener('scroll', handleScroll, { passive: true });
     return function () { window.removeEventListener('scroll', handleScroll); };
-  }, [isMobile]);
-
-  /* ★ MOBILE SCROLL — pause animations while scrolling ★ */
-  useEffect(function () {
-    if (!isMobile) return;
-    var timeout: ReturnType<typeof setTimeout> | null = null;
-
-    function onScroll() {
-      if (sectionRef.current) {
-        sectionRef.current.classList.add('hero-scrolling');
-      }
-      if (timeout) clearTimeout(timeout);
-      timeout = setTimeout(function () {
-        if (sectionRef.current) {
-          sectionRef.current.classList.remove('hero-scrolling');
-        }
-      }, 200);
-    }
-
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return function () {
-      window.removeEventListener('scroll', onScroll);
-      if (timeout) clearTimeout(timeout);
-    };
   }, [isMobile]);
 
   var handleScrollTo = useCallback(function (href: string) {
@@ -236,7 +191,7 @@ export default function Hero() {
     if (el) el.scrollIntoView({ behavior: 'smooth' });
   }, []);
 
-  /* ★ pick counts based on device ★ */
+  /* pick counts based on device */
   var mc = isMobile;
   var activeEmbers = mc ? embers.slice(0, MOBILE_EMBERS) : embers;
   var activeSparks = mc ? sparkPositions.slice(0, MOBILE_SPARKS) : sparkPositions;
@@ -246,191 +201,162 @@ export default function Hero() {
   var warriorEmberCount = mc ? MOBILE_WARRIOR_EMBERS : 8;
 
   return (
-    <>
-      <style dangerouslySetInnerHTML={{ __html: `
-        .hero-scrolling .ember-particle,
-        .hero-scrolling .hero-spark,
-        .hero-scrolling .speed-line,
-        .hero-scrolling .hero-smoke-full-1,
-        .hero-scrolling .hero-smoke-full-2,
-        .hero-scrolling .hero-smoke-full-3,
-        .hero-scrolling .fog-layer-1,
-        .hero-scrolling .fog-layer-2,
-        .hero-scrolling .fog-layer-3,
-        .hero-scrolling .mobile-ember,
-        .hero-scrolling .mobile-warrior-lightning,
-        .hero-scrolling .hero-rays-spin,
-        .hero-scrolling .hero-bg-grain,
-        .hero-scrolling .hero-bg-runes,
-        .hero-scrolling .hero-ring-d0,
-        .hero-scrolling .hero-ring-d1,
-        .hero-scrolling .hero-ring-d2,
-        .hero-scrolling .hero-rune-symbol,
-        .hero-scrolling .hero-glow-primary,
-        .hero-scrolling .hero-glow-secondary,
-        .hero-scrolling .animate-hero-logo,
-        .hero-scrolling .hero-logo-glow {
-          animation-play-state: paused !important;
-        }
-      ` }} />
+    <section id="home" ref={sectionRef} className="relative min-h-screen flex items-center justify-center overflow-hidden">
+      <div className="absolute inset-0 z-0 bg-background">
+        <div className="absolute inset-x-0 top-0 h-64 bg-gradient-to-b from-background via-transparent to-transparent" />
+        <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-background to-transparent" />
+      </div>
 
-      <section id="home" ref={sectionRef} className="relative min-h-screen flex items-center justify-center overflow-hidden">
-        <div className="absolute inset-0 z-0 bg-background">
-          <div className="absolute inset-x-0 top-0 h-64 bg-gradient-to-b from-background via-transparent to-transparent" />
-          <div className="absolute inset-x-0 bottom-0 h-48 bg-gradient-to-t from-background to-transparent" />
-        </div>
+      {/* Background layers */}
+      <div className="absolute inset-0 z-[1] pointer-events-none hero-bg-grain" />
+      <div className="absolute inset-0 z-[1] pointer-events-none hero-bg-split" />
+      {!mc && <div className="absolute inset-0 z-[1] pointer-events-none hero-smoke-full-1" />}
+      {!mc && <div className="absolute inset-0 z-[1] pointer-events-none hero-smoke-full-2" />}
+      {!mc && <div className="absolute inset-0 z-[1] pointer-events-none hero-smoke-full-3" />}
+      <div className="absolute inset-0 z-[1] pointer-events-none hero-bg-runes" />
+      <div className="hero-rune-symbol" />
 
-        {/* Background layers */}
-        <div className="absolute inset-0 z-[1] pointer-events-none hero-bg-grain" />
-        <div className="absolute inset-0 z-[1] pointer-events-none hero-bg-split" />
-        <div className="absolute inset-0 z-[1] pointer-events-none hero-smoke-full-1" />
-        <div className="absolute inset-0 z-[1] pointer-events-none hero-smoke-full-2" />
-        <div className="absolute inset-0 z-[1] pointer-events-none hero-smoke-full-3" />
-        <div className="absolute inset-0 z-[1] pointer-events-none hero-bg-runes" />
-        <div className="hero-rune-symbol" />
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] sm:w-[600px] sm:h-[600px] lg:w-[900px] lg:h-[900px] rounded-full opacity-50 z-0 pointer-events-none hero-glow-primary" />
+      {!mc && <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200px] h-[200px] sm:w-[400px] sm:h-[400px] lg:w-[600px] lg:h-[600px] rounded-full opacity-30 z-0 pointer-events-none hero-glow-secondary" />}
 
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] sm:w-[600px] sm:h-[600px] lg:w-[900px] lg:h-[900px] rounded-full opacity-50 z-0 pointer-events-none hero-glow-primary" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[200px] h-[200px] sm:w-[400px] sm:h-[400px] lg:w-[600px] lg:h-[600px] rounded-full opacity-30 z-0 pointer-events-none hero-glow-secondary" />
-
-        {/* VIKING WARRIOR */}
-        <div ref={warriorRef} className="mobile-warrior-center" aria-hidden="true" style={{ transform: 'translateX(-50%)' }}>
-          <div className="mobile-warrior-heat" />
-          {!mc && (
-            <>
-              <div className="mobile-warrior-eye mobile-warrior-eye-left" />
-              <div className="mobile-warrior-eye mobile-warrior-eye-right" />
-            </>
-          )}
-          <div className="mobile-warrior-lightning mobile-warrior-lightning-1" />
-          <div className="mobile-warrior-lightning mobile-warrior-lightning-2" />
-          <div className="mobile-warrior-lightning mobile-warrior-lightning-3" />
-          <img src="/viking-warrior.png" alt="" className="mobile-warrior-center-img" draggable={false} />
-          {Array.from({ length: warriorEmberCount }).map(function (_, i) {
-            return <div key={'we-' + i} className={'mobile-ember mobile-ember-' + (i + 1)} />;
-          })}
-        </div>
-
-        {/* Embers — reduced on mobile */}
-        <div className="absolute inset-0 z-[1] pointer-events-none overflow-hidden">
-          {activeEmbers.map(function (e) {
-            return <div key={e.id} className={'absolute rounded-full ember-particle ember-' + e.dur + ' ember-' + e.delay} style={{ left: e.left + '%', bottom: '-10px', width: e.sz, height: e.sz }} />;
-          })}
-        </div>
-
-        {/* Speed lines — reduced on mobile */}
-        <svg className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[1] pointer-events-none" width="1000" height="1000" viewBox="-500 -500 1000 1000">
-          <defs>
-            <linearGradient id="rayGrad" x1="0%" y1="0%" x2="100%" y2="0%">
-              <stop offset="0%" stopColor="#c2651a" stopOpacity="0.6" />
-              <stop offset="100%" stopColor="#c2651a" stopOpacity="0" />
-            </linearGradient>
-          </defs>
-          {activeLines.map(function (l) {
-            return <line key={l.id} x1={l.sx} y1={l.sy} x2={l.ex} y2={l.ey} className={'speed-line sl-' + l.dur + ' sl-' + l.delay} strokeWidth={l.w} strokeLinecap="round" />;
-          })}
-        </svg>
-
-        {/* Fog layers */}
-        <div className="absolute bottom-0 left-0 right-0 h-[40vh] z-[1] pointer-events-none overflow-hidden">
-          <div className="fog-layer-1 absolute bottom-0 left-[-10%] right-[-10%] h-[300px]" />
-          <div className="fog-layer-2 absolute bottom-[-5%] left-[-10%] right-[-10%] h-[250px]" />
-          <div className="fog-layer-3 absolute bottom-[-10%] left-[10%] right-[10%] h-[200px]" />
-        </div>
-
-        {/* Rotating rays — desktop only */}
+      {/* VIKING WARRIOR */}
+      <div ref={warriorRef} className="mobile-warrior-center" aria-hidden="true" style={{ transform: 'translateX(-50%)' }}>
+        {!mc && <div className="mobile-warrior-heat" />}
         {!mc && (
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[1] pointer-events-none hero-rays-spin">
-            <svg width="800" height="800" viewBox="0 0 800 800" className="opacity-20 hero-rays-blur">
-              {Array.from({ length: 12 }).map(function (_, i) {
-                return <polygon key={'ray-' + i} points="400,400 395,0 405,0" fill="url(#rayGrad)" transform={'rotate(' + (i * 30) + ' 400 400)'} opacity={0.3 + (i % 3) * 0.15} />;
-              })}
-            </svg>
-          </div>
+          <>
+            <div className="mobile-warrior-eye mobile-warrior-eye-left" />
+            <div className="mobile-warrior-eye mobile-warrior-eye-right" />
+          </>
         )}
+        <div className="mobile-warrior-lightning mobile-warrior-lightning-1" />
+        <div className="mobile-warrior-lightning mobile-warrior-lightning-2" />
+        <div className="mobile-warrior-lightning mobile-warrior-lightning-3" />
+        <img src="/viking-warrior.png" alt="" className="mobile-warrior-center-img" draggable={false} />
+        {Array.from({ length: warriorEmberCount }).map(function (_, i) {
+          return <div key={'we-' + i} className={'mobile-ember mobile-ember-' + (i + 1)} />;
+        })}
+      </div>
 
-        {/* Glow rings — reduced on mobile */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[2] pointer-events-none">
-          {activeRings.map(function (ring) {
-            return <div key={ring.id} className={'absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-primary/30 ' + ring.cls} style={{ width: ring.size, height: ring.size }} />;
-          })}
+      {/* Embers — reduced on mobile */}
+      <div className="absolute inset-0 z-[1] pointer-events-none overflow-hidden">
+        {activeEmbers.map(function (e) {
+          return <div key={e.id} className={'absolute rounded-full ember-particle ember-' + e.dur + ' ember-' + e.delay} style={{ left: e.left + '%', bottom: '-10px', width: e.sz, height: e.sz }} />;
+        })}
+      </div>
+
+      {/* Speed lines — reduced on mobile */}
+      <svg className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[1] pointer-events-none" width="1000" height="1000" viewBox="-500 -500 1000 1000">
+        <defs>
+          <linearGradient id="rayGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#c2651a" stopOpacity="0.6" />
+            <stop offset="100%" stopColor="#c2651a" stopOpacity="0" />
+          </linearGradient>
+        </defs>
+        {activeLines.map(function (l) {
+          return <line key={l.id} x1={l.sx} y1={l.sy} x2={l.ex} y2={l.ey} className={'speed-line sl-' + l.dur + ' sl-' + l.delay} strokeWidth={l.w} strokeLinecap="round" />;
+        })}
+      </svg>
+
+      {/* Fog layers — mobile only keeps 1 */}
+      <div className="absolute bottom-0 left-0 right-0 h-[40vh] z-[1] pointer-events-none overflow-hidden">
+        <div className="fog-layer-1 absolute bottom-0 left-[-10%] right-[-10%] h-[300px]" />
+        {!mc && <div className="fog-layer-2 absolute bottom-[-5%] left-[-10%] right-[-10%] h-[250px]" />}
+        {!mc && <div className="fog-layer-3 absolute bottom-[-10%] left-[10%] right-[10%] h-[200px]" />}
+      </div>
+
+      {/* Rotating rays — desktop only */}
+      {!mc && (
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[1] pointer-events-none hero-rays-spin">
+          <svg width="800" height="800" viewBox="0 0 800 800" className="opacity-20 hero-rays-blur">
+            {Array.from({ length: 12 }).map(function (_, i) {
+              return <polygon key={'ray-' + i} points="400,400 395,0 405,0" fill="url(#rayGrad)" transform={'rotate(' + (i * 30) + ' 400 400)'} opacity={0.3 + (i % 3) * 0.15} />;
+            })}
+          </svg>
         </div>
+      )}
 
-        {/* Spark particles — reduced on mobile */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[3] pointer-events-none">
-          {activeSparks.map(function (spark) {
-            return <div key={spark.id} className={'absolute rounded-full bg-primary hero-spark spark-' + spark.duration + 's spark-' + spark.delay} style={{ width: spark.size + 'px', height: spark.size + 'px', left: spark.left + 'px', top: spark.top + 'px', '--spark-drift': spark.drift + 'px', '--spark-shadow-size': (spark.size * 3) + 'px' } as React.CSSProperties} />;
-          })}
-        </div>
+      {/* Glow rings — reduced on mobile */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[2] pointer-events-none">
+        {activeRings.map(function (ring) {
+          return <div key={ring.id} className={'absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border-2 border-primary/30 ' + ring.cls} style={{ width: ring.size, height: ring.size }} />;
+        })}
+      </div>
 
-        {/* Floating particles — reduced on mobile */}
-        <div className="absolute inset-0 z-[1] pointer-events-none overflow-hidden">
-          {activeFloaters.map(function (f) {
-            return <div key={f.id} className={'absolute w-1 h-1 rounded-full bg-primary/30 particle-' + f.dur + ' particle-' + f.delay} style={{ left: f.left + '%', bottom: '-10px' }} />;
-          })}
-        </div>
+      {/* Spark particles — reduced on mobile */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 z-[3] pointer-events-none">
+        {activeSparks.map(function (spark) {
+          return <div key={spark.id} className={'absolute rounded-full bg-primary hero-spark spark-' + spark.duration + 's spark-' + spark.delay} style={{ width: spark.size + 'px', height: spark.size + 'px', left: spark.left + 'px', top: spark.top + 'px', '--spark-drift': spark.drift + 'px', '--spark-shadow-size': (spark.size * 3) + 'px' } as React.CSSProperties} />;
+        })}
+      </div>
 
-        {/* CONTENT */}
-        <div ref={contentRef} className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-20 pb-16 text-center">
-          <div className="mb-12">
-            <div className="relative inline-block">
-              <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[100px] sm:w-[400px] sm:h-[160px] md:w-[500px] md:h-[200px] rounded-full -z-10 hero-logo-glow" />
-              <img src="/gym-logo.png" alt="Vikings Club Tanger" width={480} height={160} className="w-[280px] sm:w-[340px] md:w-[400px] lg:w-[480px] h-auto animate-hero-logo" />
-            </div>
+      {/* Floating particles — reduced on mobile */}
+      <div className="absolute inset-0 z-[1] pointer-events-none overflow-hidden">
+        {activeFloaters.map(function (f) {
+          return <div key={f.id} className={'absolute w-1 h-1 rounded-full bg-primary/30 particle-' + f.dur + ' particle-' + f.delay} style={{ left: f.left + '%', bottom: '-10px' }} />;
+        })}
+      </div>
+
+      {/* CONTENT */}
+      <div ref={contentRef} className="relative z-10 mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 pt-20 pb-16 text-center">
+        <div className="mb-12">
+          <div className="relative inline-block">
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[280px] h-[100px] sm:w-[400px] sm:h-[160px] md:w-[500px] md:h-[200px] rounded-full -z-10 hero-logo-glow" />
+            <img src="/gym-logo.png" alt="Vikings Club Tanger" width={480} height={160} className="w-[280px] sm:w-[340px] md:w-[400px] lg:w-[480px] h-auto animate-hero-logo" />
           </div>
+        </div>
 
-          <div className="space-y-4">
-            <h1>
-              <span className="block text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold tracking-[0.25em] sm:tracking-[0.3em] text-foreground/80 animate-fade-in-up delay-500 viking-subtitle">
-                TRAIN LIKE A
+        <div className="space-y-4">
+          <h1>
+            <span className="block text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-semibold tracking-[0.25em] sm:tracking-[0.3em] text-foreground/80 animate-fade-in-up delay-500 viking-subtitle">
+              TRAIN LIKE A
+            </span>
+            <span className="viking-word-wrap relative inline-block mt-3 leading-none">
+              <span className="viking-slash" aria-hidden="true" />
+              <span className="block text-6xl sm:text-8xl md:text-9xl lg:text-[10rem] tracking-tighter viking-text-gradient animate-fade-in-up delay-700" style={{ fontFamily: "'Permanent Marker', cursive" }}>
+                VIKING
               </span>
-              <span className="viking-word-wrap relative inline-block mt-3 leading-none">
-                <span className="viking-slash" aria-hidden="true" />
-                <span className="block text-6xl sm:text-8xl md:text-9xl lg:text-[10rem] tracking-tighter viking-text-gradient animate-fade-in-up delay-700" style={{ fontFamily: "'Permanent Marker', cursive" }}>
-                  VIKING
-                </span>
-              </span>
-            </h1>
+            </span>
+          </h1>
 
-            <p className="animate-fade-in-up delay-700 mx-auto max-w-2xl text-base sm:text-lg md:text-xl leading-relaxed text-muted-foreground" style={{ fontFamily: "'Major Mono Display', monospace" }}>
-              {t('subtitle')}
-            </p>
-          </div>
+          <p className="animate-fade-in-up delay-700 mx-auto max-w-2xl text-base sm:text-lg md:text-xl leading-relaxed text-muted-foreground" style={{ fontFamily: "'Major Mono Display', monospace" }}>
+            {t('subtitle')}
+          </p>
+        </div>
 
-          <div data-pub-hide className="animate-fade-in-up delay-800 mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Button onClick={function () { handleScrollTo('pricing'); }} size="lg" className="btn-primary text-white font-semibold rounded-lg px-8 h-12 text-base animate-pulse-red">
-              {t('start_journey')}
-              <ArrowRight className="size-4" />
-            </Button>
-          </div>
+        <div data-pub-hide className="animate-fade-in-up delay-800 mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
+          <Button onClick={function () { handleScrollTo('pricing'); }} size="lg" className="btn-primary text-white font-semibold rounded-lg px-8 h-12 text-base animate-pulse-red">
+            {t('start_journey')}
+            <ArrowRight className="size-4" />
+          </Button>
+        </div>
 
-          <div data-pub-hide className="animate-fade-in-up mt-16 sm:mt-20 delay-1000">
-            <div className="glass-card inline-flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-0 rounded-2xl px-6 py-5 sm:px-12 sm:divide-x sm:divide-border/20">
-              {trustIndicators.map(function (item) {
-                return (
-                  <div key={item.id} className="flex items-center gap-3 px-4 sm:px-8">
-                    <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/15 border border-primary/20">
-                      <item.icon className="size-5 text-primary" />
-                    </div>
-                    <div className="text-left">
-                      <p className="text-lg sm:text-xl font-bold text-foreground stat-glow">{t(item.valueKey)}</p>
-                      <p className="text-xs sm:text-sm text-muted-foreground">{t(item.labelKey as keyof import('@/lib/translations').TranslationKeys)}</p>
-                    </div>
+        <div data-pub-hide className="animate-fade-in-up mt-16 sm:mt-20 delay-1000">
+          <div className="glass-card inline-flex flex-col sm:flex-row items-center justify-center gap-6 sm:gap-0 rounded-2xl px-6 py-5 sm:px-12 sm:divide-x sm:divide-border/20">
+            {trustIndicators.map(function (item) {
+              return (
+                <div key={item.id} className="flex items-center gap-3 px-4 sm:px-8">
+                  <div className="flex size-10 shrink-0 items-center justify-center rounded-lg bg-primary/15 border border-primary/20">
+                    <item.icon className="size-5 text-primary" />
                   </div>
-                );
-              })}
-            </div>
+                  <div className="text-left">
+                    <p className="text-lg sm:text-xl font-bold text-foreground stat-glow">{t(item.valueKey)}</p>
+                    <p className="text-xs sm:text-sm text-muted-foreground">{t(item.labelKey as keyof import('@/lib/translations').TranslationKeys)}</p>
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </div>
+      </div>
 
-        <div data-pub-hide className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 animate-fade-in delay-1200">
-          <button onClick={function () { handleScrollTo('about'); }} className="flex flex-col items-center gap-2 text-muted-foreground hover:text-primary transition-colors duration-300" aria-label="Scroll to about section">
-            <span className="text-xs uppercase tracking-widest font-medium">Scroll</span>
-            <div className="h-10 w-6 rounded-full border-2 border-current p-1">
-              <div className="h-2 w-full rounded-full bg-current animate-bounce" />
-            </div>
-          </button>
-        </div>
-      </section>
-    </>
+      <div data-pub-hide className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 animate-fade-in delay-1200">
+        <button onClick={function () { handleScrollTo('about'); }} className="flex flex-col items-center gap-2 text-muted-foreground hover:text-primary transition-colors duration-300" aria-label="Scroll to about section">
+          <span className="text-xs uppercase tracking-widest font-medium">Scroll</span>
+          <div className="h-10 w-6 rounded-full border-2 border-current p-1">
+            <div className="h-2 w-full rounded-full bg-current animate-bounce" />
+          </div>
+        </button>
+      </div>
+    </section>
   );
 }
