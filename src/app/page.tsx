@@ -25,33 +25,6 @@ import BackToTop from '@/components/gym/back-to-top';
 import { startMusic } from '@/components/gym/music-toggle';
 import { BookOpen, Eye, EyeOff } from 'lucide-react';
 
-/* ── LAZY RENDER — mounts children only when near viewport ── */
-function LazyRender({ children, rootMargin = '300px' }: { children: React.ReactNode; rootMargin?: string }) {
-  var ref = useRef<HTMLDivElement>(null);
-  var [ready, setReady] = useState(false);
-
-  useEffect(function () {
-    var el = ref.current;
-    if (!el) return;
-
-    var obs = new IntersectionObserver(function (entries) {
-      if (entries[0].isIntersecting) {
-        obs.disconnect();
-        setReady(true);
-      }
-    }, { rootMargin: rootMargin, threshold: 0 });
-
-    obs.observe(el);
-    return function () { obs.disconnect(); };
-  }, [rootMargin]);
-
-  if (!ready) {
-    return <div ref={ref} />;
-  }
-
-  return <>{children}</>;
-}
-
 /* ── VIKING LOADING SCREEN ── */
 function VikingLoadingScreen({ visible, onEnter }: { visible: boolean; onEnter: () => void }) {
   const [fading, setFading] = useState(false);
@@ -164,18 +137,18 @@ export default function Home() {
         <Navbar />
         <main className="flex-1">
           <Hero />
-          <LazyRender><Stats /></LazyRender>
-          <LazyRender><WhyVikings /></LazyRender>
-          <LazyRender><About /></LazyRender>
-          <LazyRender><Services /></LazyRender>
-          <LazyRender><MeetCoach /></LazyRender>
-          <LazyRender><DayGym /></LazyRender>
-          <LazyRender><Testimonials /></LazyRender>
-          <LazyRender><FeaturedReel /></LazyRender>
-          <LazyRender><ExtraCTA /></LazyRender>
-          <LazyRender><Pricing onSelectPlan={handleSelectPlan} /></LazyRender>
-          <LazyRender><FAQ /></LazyRender>
-          <LazyRender><Locations selectedPlan={selectedPlan} /></LazyRender>
+          <Stats />
+          <WhyVikings />
+          <About />
+          <Services />
+          <MeetCoach />
+          <DayGym />
+          <Testimonials />
+          <FeaturedReel />
+          <ExtraCTA />
+          <Pricing onSelectPlan={handleSelectPlan} />
+          <FAQ />
+          <Locations selectedPlan={selectedPlan} />
         </main>
         <Footer />
       </div>
