@@ -21,11 +21,36 @@ import WhatsAppButton from '@/components/gym/whatsapp-button';
 import AIChat from '@/components/gym/ai-chat';
 import MusicToggle from '@/components/gym/music-toggle';
 import BottomNav from '@/components/gym/bottom-nav';
-import NotificationPrompt from '@/components/gym/notification-prompt';
-import SwipeNav from '@/components/gym/swipe-nav';
 import BackToTop from '@/components/gym/back-to-top';
 import { startMusic } from '@/components/gym/music-toggle';
 import { BookOpen, Eye, EyeOff } from 'lucide-react';
+
+/* ── LAZY RENDER — mounts children only when near viewport ── */
+function LazyRender({ children, rootMargin = '300px' }: { children: React.ReactNode; rootMargin?: string }) {
+  var ref = useRef<HTMLDivElement>(null);
+  var [ready, setReady] = useState(false);
+
+  useEffect(function () {
+    var el = ref.current;
+    if (!el) return;
+
+    var obs = new IntersectionObserver(function (entries) {
+      if (entries[0].isIntersecting) {
+        obs.disconnect();
+        setReady(true);
+      }
+    }, { rootMargin: rootMargin, threshold: 0 });
+
+    obs.observe(el);
+    return function () { obs.disconnect(); };
+  }, [rootMargin]);
+
+  if (!ready) {
+    return <div ref={ref} />;
+  }
+
+  return <>{children}</>;
+}
 
 /* ── VIKING LOADING SCREEN ── */
 function VikingLoadingScreen({ visible, onEnter }: { visible: boolean; onEnter: () => void }) {
@@ -104,6 +129,32 @@ function PubToggle({ isPub, onToggle }: { isPub: boolean; onToggle: () => void }
   );
 }
 
+/* ── GLOBAL MOBILE SCROLL OPTIMIZATION ── */
+function GlobalScrollOptimizer() {
+  useEffect(function () {
+    if (typeof window === 'undefined') return;
+    if (window.innerWidth >= 768) return;
+
+    var timeout: ReturnType<typeof setTimeout> | null = null;
+
+    function onScroll() {
+      document.body.classList.add('is-scrolling');
+      if (timeout) clearTimeout(timeout);
+      timeout = setTimeout(function () {
+        document.body.classList.remove('is-scrolling');
+      }, 150);
+    }
+
+    window.addEventListener('scroll', onScroll, { passive: true });
+    return function () {
+      window.removeEventListener('scroll', onScroll);
+      if (timeout) clearTimeout(timeout);
+    };
+  }, []);
+
+  return null;
+}
+
 export default function Home() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState<'join' | 'contact'>('join');
@@ -133,24 +184,35 @@ export default function Home() {
 
   return (
     <div className="min-h-screen flex flex-col">
+      {/* Global CSS — pause ALL animations on mobile while scrolling */}
+      <style dangerouslySetInnerHTML={{ __html: `
+        .is-scrolling *,
+        .is-scrolling *::before,
+        .is-scrolling *::after {
+          animation-play-state: paused !important;
+          transition-duration: 0s !important;
+        }
+      ` }} />
+
+      <GlobalScrollOptimizer />
       <VikingLoadingScreen visible={!loadingDone} onEnter={handleEnter} />
 
-      <div className="flex flex-col min-h-screen" style={{ opacity: loadingDone ? 1 : 0, transition: 'opacity 0.6s ease' }}>
+      <div className={'flex flex-col min-h-screen ' + (isPublication ? 'publication-mode' : '')} style={{ opacity: loadingDone ? 1 : 0, transition: 'opacity 0.6s ease' }}>
         <Navbar />
-        <main className={'flex-1 ' + (isPublication ? 'publication-mode' : '')}>
+        <main className="flex-1">
           <Hero />
-          <Stats />
-          <WhyVikings />
-          <About />
-          <Services />
-          <MeetCoach />
-          <DayGym />
-          <Testimonials />
-          <FeaturedReel />
-          <ExtraCTA />
-          <Pricing onSelectPlan={handleSelectPlan} />
-          <FAQ />
-          <Locations selectedPlan={selectedPlan} />
+          <LazyRender><Stats /></LazyRender>
+          <LazyRender><WhyVikings /></LazyRender>
+          <LazyRender><About /></LazyRender>
+          <LazyRender><Services /></LazyRender>
+          <LazyRender><MeetCoach /></LazyRender>
+          <LazyRender><DayGym /></LazyRender>
+          <LazyRender><Testimonials /></LazyRender>
+          <LazyRender><FeaturedReel /></LazyRender>
+          <LazyRender><ExtraCTA /></LazyRender>
+          <LazyRender><Pricing onSelectPlan={handleSelectPlan} /></LazyRender>
+          <LazyRender><FAQ /></LazyRender>
+          <LazyRender><Locations selectedPlan={selectedPlan} /></LazyRender>
         </main>
         <Footer />
       </div>
@@ -160,8 +222,6 @@ export default function Home() {
       {!isPublication && <AIChat />}
       <MusicToggle center={isPublication} />
       {!isPublication && <BottomNav />}
-      {!isPublication && <NotificationPrompt />}
-      {!isPublication && <SwipeNav />}
       <BackToTop />
       {loadingDone && <PubToggle isPub={isPublication} onToggle={function () { setIsPublication(!isPublication); }} />}
     </div>
